@@ -10,7 +10,7 @@ $(function(){
         var orig = $(this).html();
         var pattern = /---\s*<a class=\"b\" href=\"\/\?q=spoiler\">spoiler<\/a>\s*---\s*<br>\s*(.*)\s*<br>\s*---\s*<a class=\"b\" href=\"\/\?q=spoiler\">spoiler<\/a>\s*---/g;
         var modif = orig.replace(pattern, function(match, spoilerText){
-            return "<div class='spoilerOuter'> <button class='spoilerButton'>---spoiler---</button> <div class='spoilerText'>"+spoilerText+"</div></div>";
+            return "<div class='spoilerOuter'> <button class='spoilerButton primary'>spoiler ac/kapa</button> <div class='spoilerText'>"+spoilerText+"</div></div>";
         });
 
         $(this).html(modif);
@@ -109,10 +109,15 @@ $(function(){
                     if(elem !== null){
                         self.next().show();
                     } else {
+                        // make a twitter api request to find out the embed code
+                        // twitter embed thingy changes the element immediately
+                        // so when we set elem = self.next(), that element is destroyed when the actual iframe is loaded 
+                        // so we need to specify self.next() to hide/show the iframe loaded from twitter
                         $.ajax("https://api.twitter.com/1/statuses/oembed.json?id="+ tweetId).done(function(data){
                             $(data.html).insertAfter(self);
                             elem = self.next();
                         }).fail(function(data){
+                            // todo: handle errors depending on error message we've got.
                             elem = $("<blockquote>Yokmus boyle bi tweet</blockquote>").insertAfter(self);
                         });
                     }
@@ -138,6 +143,7 @@ $(function(){
     };
 
     var removeSponsored = function(){
+        // remove li elements that contain sponsored links
         $(".topic-list a.sponsored").parent().remove();
     };
 
@@ -162,7 +168,10 @@ $(function(){
     };
 
     var hijackSettings = function(){
+        // add button to tabs
+        // todo: add button to alternative navigation as well
         var plasplasBtn = $("<li><a href='#'>plasplas</a></li>").appendTo($("#settings-tabs"));
+
         plasplasBtn.click(function(){
             $("#settings-tabs .active").removeClass("active");
             plasplasBtn.addClass("active");     // change active tab
@@ -170,6 +179,7 @@ $(function(){
             var altNav = $("#settings-alternate-nav");
             altNav.nextAll().remove();   // clear the settings page
 
+            // assemble the  settings pane
             $("<button class='primary'>kaydet</button>").insertAfter(altNav).click(function(){
                 console.log("ananzaa");
                 return false;
