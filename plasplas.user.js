@@ -123,8 +123,7 @@ $(function(){
                 return false;
             });
         }
-
-    }
+    };
 
     var akilliBkzClicker = function(){
         $(this).click(function(){
@@ -150,18 +149,47 @@ $(function(){
         return true;
     };
 
-    $("#aside").remove();                                    // konulu videolari yoket
-    $("#content-body").css("width", "990px");    
+    var hijackMain = function(){
+        $("#aside").remove();                                    // konulu videolari yoket
+        $("#content-body").css("width", "990px");    
 
-    $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
-    $("article .content a.url").each(replaceImages);         // resim gommece
-    $("article .content a.url").each(replaceYoutube);        // youtube gommece
-    $("article .content a.url").each(replaceTwitter);        // twitter gommece
-    
-    removeSponsored();                                       // sol frame reklami yoket
-    $("#feed-refresh-link").click(removeSponsoredRefresh);   // her yenilemede yoket
-    $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
-    $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
-    
-    $("sup.ab a").each(akilliBkzClicker);                    // mobil icin akilli bakiniz tiklatgaci
+        $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
+        $("article .content a.url").each(replaceImages);         // resim gommece
+        $("article .content a.url").each(replaceYoutube);        // youtube gommece
+        $("article .content a.url").each(replaceTwitter);        // twitter gommece
+        
+        $("sup.ab a").each(akilliBkzClicker);                    // mobil icin akilli bakiniz tiklatgaci
+    };
+
+    var hijackSettings = function(){
+        var plasplasBtn = $("<li><a href='#'>plasplas</a></li>").appendTo($("#settings-tabs"));
+        plasplasBtn.click(function(){
+            $("#settings-tabs .active").removeClass("active");
+            plasplasBtn.addClass("active");     // change active tab
+
+            var altNav = $("#settings-alternate-nav");
+            altNav.nextAll().remove();   // clear the settings page
+
+            $("<button class='primary'>kaydet</button>").insertAfter(altNav).click(function(){
+                console.log("ananzaa");
+                return false;
+            });
+        });
+    };
+
+    var hijackSolFrame = function(){
+        removeSponsoredRefresh();                                 // sol frame reklami yoket
+        $("#feed-refresh-link").click(removeSponsoredRefresh);    // her yenilemede yoket
+        $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
+        $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
+    };
+
+    var path = window.location.pathname;
+
+    if(path.match(/\/ayarlar\//)){
+        hijackSettings();
+    } else {
+        hijackMain();
+    }
+    hijackSolFrame();
 });
