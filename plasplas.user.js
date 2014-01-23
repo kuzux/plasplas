@@ -27,8 +27,10 @@ $(function(){
         var url = $(this).attr("href");
         var shown = false;
         var elem = null;
+        var self = $(this);
+
         if(url.match(/\.(gif|jpg|png|jpeg|bmp)/)){
-            $(this).click(function(e){
+            self.click(function(e){
                 if(e.which !== 1){
                     return true; // middle clickte linki ac
                 }
@@ -38,7 +40,7 @@ $(function(){
                     if(elem !== null){
                         elem.show();
                     } else {
-                        elem = $("<img class='plasplas-img' src='"+url+"' style='display:block' />").insertAfter($(this));
+                        elem = $("<img class='plasplas-img' src='"+url+"' style='display:block' />").insertAfter(self);
                     }
                 } else {
                     shown = false;
@@ -54,7 +56,8 @@ $(function(){
         var shown = false;
         var elem = null;
         var videoId = null;
-        
+        var self = $(this);
+    
         if(url.match(/youtu.be\/[a-zA-Z0-9\-]+/)){
             videoId = url.match(/youtu.be\/([a-zA-Z0-9\-]+)/)[1];
         } else if (url.match(/youtube.com/)){
@@ -62,7 +65,7 @@ $(function(){
         }
 
         if(videoId !== null){
-            $(this).click(function(e){
+            self.click(function(e){
                 if(e.which !== 1){
                     return true; // middle clickte linki ac
                 }
@@ -72,7 +75,7 @@ $(function(){
                     if(elem !== null){
                         elem.show();
                     } else {
-                        elem = $("<iframe width='420' height='315' style='display:block' src='//www.youtube.com/embed/" + videoId + "' frameborder='0' allowfullscreen></iframe>").insertAfter($(this));
+                        elem = $("<iframe width='420' height='315' style='display:block' src='//www.youtube.com/embed/" + videoId + "' frameborder='0' allowfullscreen></iframe>").insertAfter(self);
                     }
                 } else {
                     elem.hide();
@@ -82,6 +85,45 @@ $(function(){
             });
         }
     };
+
+    var replaceTwitter = function(){
+        var url = $(this).attr("href");
+        var shown = false;
+        var elem = null;
+        var tweetId = null;
+        var self = $(this);
+        
+        if(url.match(/twitter.com\/.*\/status\/(\d+)\/?/)){
+            tweetId = url.match(/twitter.com\/.*\/status\/(\d+)\/?/)[1];
+            console.log(tweetId);
+        }
+
+        if(tweetId!==null){
+            $(this).click(function(e){
+                if(e.which !== 1){
+                    return true; // middle clickte linki ac
+                }
+
+                if(!shown){
+                    shown = true;
+                    if(elem !== null){
+                        self.next().show();
+                    } else {
+                        $.ajax("https://api.twitter.com/1/statuses/oembed.json?id="+ tweetId).done(function(data){
+                            console.log(data.html);
+                            $(data.html).insertAfter(self);
+                            elem = self.next();
+                        });
+                    }
+                } else {
+                    shown = false;
+                    self.next().hide();
+                }
+                return false;
+            });
+        }
+
+    }
 
     var akilliBkzClicker = function(){
         $(this).click(function(){
@@ -113,6 +155,7 @@ $(function(){
     $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
     $("article .content a.url").each(replaceImages);         // resim gommece
     $("article .content a.url").each(replaceYoutube);        // youtube gommece
+    $("article .content a.url").each(replaceTwitter);        // twitter gommece
     
     removeSponsored();                                       // sol frame reklami yoket
     $("#feed-refresh-link").click(removeSponsoredRefresh);   // her yenilemede yoket
