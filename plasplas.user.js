@@ -116,6 +116,8 @@ $(function(){
     
     removeSponsored();                                       // sol frame reklami yoket
     $("#feed-refresh-link").click(removeSponsoredRefresh);   // her yenilemede yoket
+    $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
+    $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
     
     $("sup.ab a").each(akilliBkzClicker);                    // mobil icin akilli bakiniz tiklatgaci
 });
