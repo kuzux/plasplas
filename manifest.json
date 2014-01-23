@@ -1,6 +1,7 @@
 {
     "name": "Plasplas",
-    "version": "1",
+    "version": "0.0.1",
+    "description": "Eksi Sozluk e bonus feature lar sakalar komiklikler",
     "manifest_version": 2,
     "content_scripts": [{
         "js": ["jquery-1.10.2.min.js", "plasplas.user.js"],
