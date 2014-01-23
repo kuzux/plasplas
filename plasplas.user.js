@@ -110,9 +110,10 @@ $(function(){
                         self.next().show();
                     } else {
                         $.ajax("https://api.twitter.com/1/statuses/oembed.json?id="+ tweetId).done(function(data){
-                            console.log(data.html);
                             $(data.html).insertAfter(self);
                             elem = self.next();
+                        }).fail(function(data){
+                            elem = $("<blockquote>Yokmus boyle bi tweet</blockquote>").insertAfter(self);
                         });
                     }
                 } else {
