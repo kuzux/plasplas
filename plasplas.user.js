@@ -58,6 +58,9 @@ $(function(){
         var videoId = null;
         var self = $(this);
     
+        // match youtube.com?v=videoId
+        // and   youtu.be/videoId
+        // possibly there are more url types?
         if(url.match(/youtu.be\/[a-zA-Z0-9\-]+/)){
             videoId = url.match(/youtu.be\/([a-zA-Z0-9\-]+)/)[1];
         } else if (url.match(/youtube.com/)){
@@ -95,7 +98,6 @@ $(function(){
         
         if(url.match(/twitter.com\/.*\/status\/(\d+)\/?/)){
             tweetId = url.match(/twitter.com\/.*\/status\/(\d+)\/?/)[1];
-            console.log(tweetId);
         }
 
         if(tweetId!==null){
@@ -155,16 +157,34 @@ $(function(){
         return true;
     };
 
-    var hijackMain = function(){
-        $("#aside").remove();                                    // konulu videolari yoket
-        $("#content-body").css("width", "990px");    
+    var hijackSolFrame = function(){
+        if(localStorage["plasplas-akilli-bkz"]){
+            removeSponsoredRefresh();                                 // sol frame reklami yoket
+            $("#feed-refresh-link").click(removeSponsoredRefresh);    // her yenilemede yoket
+            $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
+            $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
+        }
+    };
 
-        $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
-        $("article .content a.url").each(replaceImages);         // resim gommece
-        $("article .content a.url").each(replaceYoutube);        // youtube gommece
-        $("article .content a.url").each(replaceTwitter);        // twitter gommece
+    var hijackMain = function(){
+        if(localStorage["plasplas-konulu"]){
+            $("#aside").remove();                                    // konulu videolari yoket
+            $("#content-body").css("width", "990px");    
+        }
+
+        if(localStorage["plasplas-spoiler"]){
+            $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
+        }
+
+        if(localStorage["plasplas-embed-stuff"]){   
+            $("article .content a.url").each(replaceImages);         // resim gommece
+            $("article .content a.url").each(replaceYoutube);        // youtube gommece
+            $("article .content a.url").each(replaceTwitter);        // twitter gommece
+        }
         
-        $("sup.ab a").each(akilliBkzClicker);                    // mobil icin akilli bakiniz tiklatgaci
+        if(localStorage["plasplas-akilli-bkz"]){
+            $("sup.ab a").each(akilliBkzClicker);                    // mobil icin akilli bakiniz tiklatgaci
+        }
     };
 
     var hijackSettings = function(){
@@ -177,22 +197,49 @@ $(function(){
             plasplasBtn.addClass("active");     // change active tab
 
             var altNav = $("#settings-alternate-nav");
-            altNav.nextAll().remove();   // clear the settings page
+            altNav.nextAll().remove();         // clear the settings page
+
+            var pane = $("<div></div>").insertAfter(altNav);
 
             // assemble the  settings pane
-            $("<button class='primary'>kaydet</button>").insertAfter(altNav).click(function(){
-                console.log("ananzaa");
+            pane.append("<p><input type='checkbox' id='plasplas-embed-stuff' /> Resim/Video/Twitter gom</p>");
+            pane.append("<p><input type='checkbox' id='plasplas-akilli-bkz' /> Akilli Bkzlari Ac </p>");
+            pane.append("<p><input type='checkbox' id='plasplas-spoiler' /> Spoilerlarin serrinden koru </p>");
+            pane.append("<p><input type='checkbox' id='plasplas-reklam' /> Sol frame reklamlarini gizle </p>");
+            pane.append("<p><input type='checkbox' id='plasplas-konulu' /> Konulu videolari gizle </p>");
+
+            var boolSettings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu"];
+            boolSettings.forEach(function(e){
+                if(localStorage[e]){
+                    $("#" + e).prop('checked', true);
+                }
+            });
+
+            $("<button class='primary'>kaydet</button>").appendTo(pane).click(function(){
+                boolSettings.forEach(function(e){
+                    if($("#" + e).is(":checked")){
+                        localStorage[e] = true;
+                    } else {
+                        localStorage[e] = false;
+                    }
+                });
                 return false;
             });
         });
     };
 
-    var hijackSolFrame = function(){
-        removeSponsoredRefresh();                                 // sol frame reklami yoket
-        $("#feed-refresh-link").click(removeSponsoredRefresh);    // her yenilemede yoket
-        $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
-        $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
+    var loadDefaultSettings = function(){
+        var settings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu"];
+        var defaults = [true, true, true, true, true];
+
+        settings.forEach(function(e, idx){
+            if(localStorage[e] === undefined){
+                localStorage[e] = defaults[idx];
+            }
+        });
     };
+
+    loadDefaultSettings();
 
     var path = window.location.pathname;
 
