@@ -182,7 +182,7 @@ $(function(){
             $("#quick-index-nav a[href='/gundem']").click(removeSponsored);
         }
 
-        if(localStorage["plasplas-yasakli-kelime"]!==[]){
+        if(localStorage["plasplas-yasakli-kelime"]!==""){
             removeBannedTitles();
             $("#feed-refresh-link").click(removeBannedTitles);    // her yenilemede yoket
             $("#quick-index-nav a[href='/bugun']").click(removeBannedTitles);
