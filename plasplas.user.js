@@ -31,7 +31,7 @@ $(function(){
 
         if(url.match(/\.(gif|jpg|png|jpeg|bmp)/)){
             self.click(function(e){
-                if(e.which !== 1){
+                if(e.which !== 1 || e.ctrlKey === true){
                     return true; // middle clickte linki ac
                 }
 
@@ -69,7 +69,7 @@ $(function(){
 
         if(videoId !== null){
             self.click(function(e){
-                if(e.which !== 1){
+                if(e.which !== 1 || e.ctrlKey === true){
                     return true; // middle clickte linki ac
                 }
 
@@ -102,7 +102,7 @@ $(function(){
 
         if(tweetId!==null){
             $(this).click(function(e){
-                if(e.which !== 1){
+                if(e.which !== 1 || e.ctrlKey === true){
                     return true; // middle clickte linki ac
                 }
 
