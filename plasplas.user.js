@@ -145,24 +145,48 @@ $(function(){
     };
 
     var removeSponsored = function(){
-        // remove li elements that contain sponsored links
-        $(".topic-list a.sponsored").parent().remove();
+        var removeLinks = function(){
+            // remove li elements that contain sponsored links
+            $(".topic-list a.sponsored").parent().remove();
+        };
+
+        setTimeout(removeLinks, 1000); // load suresini bilemeyiz, baglanti yavassa sictik
+                                           // belki baska, duzgun yolu da vardir?
+        setTimeout(removeLinks, 3000);
+        setTimeout(removeLinks, 9000);
+        return true;
     };
 
-    var removeSponsoredRefresh = function(){
-        setTimeout(removeSponsored, 1000); // load suresini bilemeyiz, baglanti yavassa sictik
-                                           // belki baska, duzgun yolu da vardir?
-        setTimeout(removeSponsored, 3000);
-        setTimeout(removeSponsored, 9000);
+    var removeBannedTitles = function(){
+        var regex = new RegExp(localStorage["plasplas-yasakli-kelime"].split(",").join("|"));
+        var removeLinks = function(){
+            $(".topic-list a").each(function(){
+                if($(this).text().match(regex)){
+                    console.log($(this).text());
+                    $(this).parent().remove();
+                }
+            });
+        };
+
+        setTimeout(removeLinks, 1000);
+        setTimeout(removeLinks, 3000);
+        setTimeout(removeLinks, 9000);
         return true;
     };
 
     var hijackSolFrame = function(){
         if(localStorage["plasplas-akilli-bkz"]){
-            removeSponsoredRefresh();                                 // sol frame reklami yoket
-            $("#feed-refresh-link").click(removeSponsoredRefresh);    // her yenilemede yoket
-            $("#quick-index-nav a[href='/bugun']").click(removeSponsoredRefresh);
-            $("#quick-index-nav a[href='/gundem']").click(removeSponsoredRefresh);
+            removeSponsored();                                 // sol frame reklami yoket
+            $("#feed-refresh-link").click(removeSponsored);    // her yenilemede yoket
+            $("#quick-index-nav a[href='/bugun']").click(removeSponsored);
+            $("#quick-index-nav a[href='/gundem']").click(removeSponsored);
+        }
+
+        if(localStorage["plasplas-yasakli-kelime"]!==[]){
+            removeBannedTitles();
+            $("#feed-refresh-link").click(removeBannedTitles);    // her yenilemede yoket
+            $("#quick-index-nav a[href='/bugun']").click(removeBannedTitles);
+            $("#quick-index-nav a[href='/gundem']").click(removeBannedTitles);
         }
     };
 
@@ -201,13 +225,15 @@ $(function(){
 
             var pane = $("<div></div>").insertAfter(altNav);
 
-            // assemble the  settings pane
+            // assemble the settings pane
             pane.append("<p><input type='checkbox' id='plasplas-embed-stuff' /> Resim/Video/Twitter gom</p>");
             pane.append("<p><input type='checkbox' id='plasplas-akilli-bkz' /> Akilli Bkzlari Ac </p>");
             pane.append("<p><input type='checkbox' id='plasplas-spoiler' /> Spoilerlarin serrinden koru </p>");
             pane.append("<p><input type='checkbox' id='plasplas-reklam' /> Sol frame reklamlarini gizle </p>");
             pane.append("<p><input type='checkbox' id='plasplas-konulu' /> Konulu videolari gizle </p>");
+            pane.append("<p>Sol frame'den yasakli kelimeler <br /> <input type='text' id='plasplas-yasakli-kelime' /></p>");
 
+            // load the current settings to pane from local storage
             var boolSettings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu"];
             boolSettings.forEach(function(e){
                 if(localStorage[e]){
@@ -215,7 +241,10 @@ $(function(){
                 }
             });
 
+            $("#plasplas-yasakli-kelime").val(localStorage["plasplas-yasakli-kelime"]);
+
             $("<button class='primary'>kaydet</button>").appendTo(pane).click(function(){
+                // store the settings to local storage
                 boolSettings.forEach(function(e){
                     if($("#" + e).is(":checked")){
                         localStorage[e] = true;
@@ -223,14 +252,18 @@ $(function(){
                         localStorage[e] = false;
                     }
                 });
+
+                localStorage["plasplas-yasakli-kelime"] = $("#plasplas-yasakli-kelime").val().toLowerCase().split(/\s*,\s*/);
+
+                pane.append("<p>Kaydedildi Efenim</p>");
                 return false;
             });
         });
     };
 
     var loadDefaultSettings = function(){
-        var settings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu"];
-        var defaults = [true, true, true, true, true];
+        var settings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu", "plasplas-yasakli-kelime"];
+        var defaults = [true, true, true, true, true, ""];
 
         settings.forEach(function(e, idx){
             if(localStorage[e] === undefined){
