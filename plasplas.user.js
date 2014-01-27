@@ -196,6 +196,10 @@ $(function(){
             $("#content-body").css("width", "990px");    
         }
 
+        if(localStorage["plasplas-59saniye"]){
+            $("#content-body #video").remove();
+        }
+
         if(localStorage["plasplas-spoiler"]){
             $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
         }
@@ -231,10 +235,11 @@ $(function(){
             pane.append("<p><input type='checkbox' id='plasplas-spoiler' /> Spoilerlarin serrinden koru </p>");
             pane.append("<p><input type='checkbox' id='plasplas-reklam' /> Sol frame reklamlarini gizle </p>");
             pane.append("<p><input type='checkbox' id='plasplas-konulu' /> Konulu videolari gizle </p>");
+            pane.append("<p><input type='checkbox' id='plasplas-59saniye' /> 59 saniye videolarini gizle </p>");
             pane.append("<p>Sol frame'den yasakli kelimeler <br /> <input type='text' id='plasplas-yasakli-kelime' /></p>");
 
             // load the current settings to pane from local storage
-            var boolSettings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu"];
+            var boolSettings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu", "plasplas-59saniye"];
             boolSettings.forEach(function(e){
                 if(localStorage[e]){
                     $("#" + e).prop('checked', true);
@@ -262,8 +267,8 @@ $(function(){
     };
 
     var loadDefaultSettings = function(){
-        var settings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu", "plasplas-yasakli-kelime"];
-        var defaults = [true, true, true, true, true, ""];
+        var settings = ["plasplas-embed-stuff", "plasplas-akilli-bkz", "plasplas-spoiler", "plasplas-reklam", "plasplas-konulu", "plasplas-59saniye","plasplas-yasakli-kelime"];
+        var defaults = [true, true, true, true, true, false, ""];
 
         settings.forEach(function(e, idx){
             if(localStorage[e] === undefined){
