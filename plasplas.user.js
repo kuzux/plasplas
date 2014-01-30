@@ -177,6 +177,39 @@ $(function(){
         }
     };
 
+    var replaceSwf = function(){
+        var url = $(this).attr("href");
+        var shown = false;
+        var elem = null;
+        var self = $(this);
+
+        // can we do something to bypass swf s being blocked by chrome on https?
+        // i doubt anything could be done, at least it's just a one-time inconvenience
+        if(url.match(/\.swf$/)){
+            $(this).click(function(e){
+                if(e.which !== 1 || e.ctrlKey === true){
+                    return true; // middle clickte linki ac
+                }
+
+                if(!shown){
+                    shown = true;
+                    if(elem!==null){
+                        self.next().show();
+                        self.next().css("display", "block");
+                    } else {
+                        elem = $("<object style='display:block' type='application/x-shockwave-flash' width='400' height='400'></object>").insertAfter(self);
+                        elem.append("<param name='movie' value='"+url+"' />");
+                        elem.append("<embed src='"+url+"' width='400' height='400'></embed>");
+                    }
+                } else {
+                    shown = false;
+                    self.next().hide();
+                }
+                return false;
+            });
+        }
+    };
+
     var akilliBkzClicker = function(){
         $(this).click(function(){
             if($(this).html()==="*"){
@@ -255,6 +288,7 @@ $(function(){
             $("article .content a.url").each(replaceImages);         // resim gommece
             $("article .content a.url").each(replaceYoutube);        // youtube gommece
             $("article .content a.url").each(replaceTwitter);        // twitter gommece
+            $("article .content a.url").each(replaceSwf);            // swf gom
             $("article .content a.b").each(replaceEntry);            // entry bkz i gommece
         }
         
