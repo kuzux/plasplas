@@ -23,6 +23,8 @@ $(function(){
         });
     };
 
+    // TODO: those replace functions repeat a lot of boilerplate code
+    // DRY them up.
     var replaceImages = function(){
         var url = $(this).attr("href");
         var shown = false;
@@ -132,6 +134,49 @@ $(function(){
         }
     };
 
+    var replaceEntry = function(){
+        var url = $(this).attr("href");
+        var shown = false;
+        var elem = null;
+        var self = $(this);
+
+        if(url.match(/^\/entry\//)){
+            $(this).click(function(e){
+                if(e.which !== 1 || e.ctrlKey === true){
+                    return true; // middle clickte linki ac
+                }
+
+                if(!shown){
+                    shown = true;
+
+                    if(elem !== null){
+                        self.next().show();
+                    } else {
+                        // fetch the entry page and scrape the shit out of it.
+                        $.get(url, function(data){
+                            var doc = $("<div></div>").html(data);
+                            var title = doc.find("#content-body #title");
+                            var entries = doc.find("#content-body #entry-list");
+                            elem = $("<div></div>").insertAfter(self);
+                            elem.css({
+                                "width": "600px",
+                                "background-color": "rgba(0,0,0,0.1)",
+                                "border": "2px solid rgba(0,0,0,0.3)",
+                                "padding": "5px"
+                            });
+                            elem.append(title);
+                            elem.append(entries);
+                        });
+                    }
+                } else {
+                    shown = false;
+                    self.next().hide();
+                }
+                return false;
+            });
+        }
+    };
+
     var akilliBkzClicker = function(){
         $(this).click(function(){
             if($(this).html()==="*"){
@@ -204,10 +249,13 @@ $(function(){
             $("article .content").each(replaceSpoiler);              // spoiler koruma sistemi
         }
 
-        if(localStorage["plasplas-embed-stuff"]){   
+        if(localStorage["plasplas-embed-stuff"]){
+            // If this causes performance issues, group all replace functions in a single loop
+            // instead of looping over all links for every function
             $("article .content a.url").each(replaceImages);         // resim gommece
             $("article .content a.url").each(replaceYoutube);        // youtube gommece
             $("article .content a.url").each(replaceTwitter);        // twitter gommece
+            $("article .content a.b").each(replaceEntry);            // entry bkz i gommece
         }
         
         if(localStorage["plasplas-akilli-bkz"]){
